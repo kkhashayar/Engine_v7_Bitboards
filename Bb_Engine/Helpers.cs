@@ -4,9 +4,6 @@ public static class Helpers
 {
     public static class PieceMapper
     {
-
-        
-
         public static Dictionary<char, char> pieceToUnicode = new Dictionary<char, char>
         {
             {'P', '\u2659'}, // white pawn
@@ -22,11 +19,10 @@ public static class Helpers
             {'q', '\u265B'}, // black queen
             {'k', '\u265A'}  // black king
         };
-
     }
 
 
-        public static Dictionary<string, ulong> CoordinateToBitboard = new Dictionary<string, ulong>
+    public static Dictionary<string, ulong> CoordinateToBitBoard = new Dictionary<string, ulong>
     {
         {"h8", 0x8000000000000000UL}, {"g8", 0x4000000000000000UL}, {"f8", 0x2000000000000000UL}, {"e8", 0x1000000000000000UL},
         {"d8", 0x800000000000000UL},  {"c8", 0x400000000000000UL},  {"b8", 0x200000000000000UL},  {"a8", 0x100000000000000UL},
@@ -46,7 +42,7 @@ public static class Helpers
         {"d1", 0x8UL},                {"c1", 0x4UL},                {"b1", 0x2UL},                {"a1", 0x1UL}
     };
 
-        public static Dictionary<ulong, string> BitboardToCoordinate = new Dictionary<ulong, string>
+    public static Dictionary<ulong, string> BitBoardToCoordinate = new Dictionary<ulong, string>
     {
         {0x8000000000000000UL, "h8"}, {0x4000000000000000UL, "g8"}, {0x2000000000000000UL, "f8"}, {0x1000000000000000UL, "e8"},
         {0x800000000000000UL, "d8"},  {0x400000000000000UL, "c8"},  {0x200000000000000UL, "b8"},  {0x100000000000000UL, "a8"},
@@ -65,8 +61,5 @@ public static class Helpers
         {0x80UL, "h1"},               {0x40UL, "g1"},               {0x20UL, "f1"},               {0x10UL, "e1"},
         {0x8UL, "d1"},                {0x4UL, "c1"},                {0x2UL, "b1"},                {0x1UL, "a1"}
 
-
     };
-
-
 }
