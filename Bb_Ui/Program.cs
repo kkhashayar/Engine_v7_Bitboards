@@ -1,7 +1,7 @@
 ﻿using Bb_Engine;
 using Bb_Engine.ExternalResources;
 
-string fen = "3k4/8/8/8/8/8/8/3K4 w - - 0 1";
+string fen = "8/8/8/7k/8/7K/8/8 w - - 0 1";
 Fen.Read(fen);
 
 RunPerftWIthVerification(fen, 2);
@@ -14,7 +14,7 @@ PrintBoardSquareNumbers();
 void RunPerftWIthVerification(string fen, int perftDepth)
 {
     Console.ForegroundColor = ConsoleColor.Black;
-    Console.WriteLine("******* Engine 6 *******  \n");
+    Console.WriteLine("******* Engine 7 BitBoards *******  \n");
     Console.WriteLine($"Perft test in depth: {perftDepth} on: \n");
     Console.WriteLine($"{fen} \n");
     Perft.TestPerft(fen, perftDepth);

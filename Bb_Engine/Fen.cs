@@ -24,7 +24,7 @@
                 }
                 else
                 {
-                    int bitPosition = rank * 8 + file;
+                    int bitPosition = (7 - rank) * 8 + file;
 
                     switch (symbol)
                     {

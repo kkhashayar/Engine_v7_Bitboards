@@ -5,23 +5,31 @@ public static class Perft
 {
     public static ulong RunPerft(List<ulong> boards, int depth, int turn, bool legalMovesOnly = true)
     {
+        List<MoveObject> moves = new(); 
         if (depth == 0)
         {
             return 1; // Base case: one leaf node reached
         }
+        
+        if(turn == 0) moves = MoveGenerator.GenerateWhiteMoves(boards);
+        else if(turn  == 1) moves = MoveGenerator.GenerateBlackMoves(boards);   
 
-        List<MoveObject> moves = MoveGenerator.GenerateMoves(boards, turn, legalMovesOnly);
+
         ulong nodes = 0;
 
         foreach (var move in moves)
         {
-            MoveHandlers.MakeMove(boards, move);
-            nodes += RunPerft(boards, depth - 1, 1 - turn, legalMovesOnly); // Switch turn
-            MoveHandlers.UndoMove(boards);
+            // Clone the current board state before making the move
+            List<ulong> clonedBoards = new List<ulong>(boards);  // Deep copy the bitboards
+
+            MoveHandlers.MakeMove(clonedBoards, move);
+            nodes += RunPerft(clonedBoards, depth - 1, turn ^ 1, legalMovesOnly); // FIXED: pass the flipped turn without modifying `turn` in place
         }
 
         return nodes;
     }
+
+
 
     public static void TestPerft(string fen, int depth)
     {
@@ -33,26 +41,30 @@ public static class Perft
 
         ulong nodes = 0;
 
-        if (depth == 1)
+        if (depth == 0)
         {
             nodes = RunPerft(boards, depth, turn);
             Console.WriteLine($"Nodes searched: {nodes}");
         }
         else
         {
-            List<MoveObject> moves = MoveGenerator.GenerateMoves(boards, turn, true);
+            List<MoveObject> moves = new();
+            if (turn == 0) moves = MoveGenerator.GenerateWhiteMoves(boards);
+            else if(turn == 1) moves  = MoveGenerator.GenerateBlackMoves(boards);   
+            
 
             foreach (var move in moves)
             {
                 MoveHandlers.MakeMove(boards, move);
-                ulong childNodes = RunPerft(boards, depth - 1, 1 - turn);
+                ulong childNodes = RunPerft(boards, depth - 1, turn ^ 1); // FIXED: pass the flipped turn without modifying `turn` in place
                 MoveHandlers.UndoMove(boards);
-
-                Console.WriteLine($"{move.ToString()}: {childNodes}"); // Assuming MoveObject has a proper ToString override
+                // NO NEED to flip the turn again here, since it's already handled properly by UndoMove
+                Console.WriteLine($"{move.ToString()}: {childNodes}");
                 nodes += childNodes;
             }
 
             Console.WriteLine($"\nTotal nodes: {nodes}");
         }
     }
+
 }

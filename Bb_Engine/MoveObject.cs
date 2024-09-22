@@ -13,8 +13,10 @@
 
     private string SquareToNotation(int square)
     {
-        int file = square % 8;
-        int rank = square / 8;
-        return $"{(char)('a' + file)}{(char)('1' + rank)}";
+        int file = square % 8;  // This is correct.
+        int rank = square / 8;  // This gives the correct rank, but for top-down notation.
+
+        // To flip the rank so that 0 corresponds to '1' and 7 corresponds to '8':
+        return $"{(char)('a' + file)}{(char)('8' - rank)}";
     }
 }

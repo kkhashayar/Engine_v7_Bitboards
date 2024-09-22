@@ -102,16 +102,3 @@ public static class Boards
 
 
 }
-
-
-
-/*
- * 0 for A1, 63 for H8
- * Set Bit: Place a piece on a specific square.
- * Clear Bit: Remove a piece from a specific square.
- * Toggle Bit: Flip the bit for a square (useful for move generation).
- * Check Bit: Determine if a piece is on a specific square.
- * Bit Scan: Find the index of the first/last set bit (LSB/MSB).
- * Count Bits: Count the number of set bits (population count).
- * Shift: Shift the bitboard left, right, up, or down (for move generation).
- */

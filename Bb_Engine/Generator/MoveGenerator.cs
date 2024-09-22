@@ -6,79 +6,48 @@ namespace Bb_Engine.Generator;
 internal static class MoveGenerator
 {
     internal static ulong position { get; set; } = 0UL;
-    internal static List<MoveObject> GenerateMoves(List<ulong> boards, int turn, bool legalMovesOnly)
-    {
-        List<MoveObject> allMoves = new();
 
-        foreach (ulong board in boards)
-        {
-            position |= board;
-        }
+
+    internal static List<MoveObject> GenerateWhiteMoves(List<ulong> boards)
+    {
+        List<MoveObject> moves = new();
+
+        foreach (ulong board in boards) position |= board;
 
         for (int i = 0; i < boards.Count; i++)
         {
-            if ((turn == 0 && i < 6) || (turn == 1 && i >= 6))
-            {
-                switch (i)
-                {
-                    case 0:
-                        // Generate moves for White Pawns
-                        allMoves.AddRange(Generator.Pawns.GetWhitePawns(boards, position));
-                        break;
-                    case 1:
-                        // Generate moves for White Rooks
-                        break;
-                    case 2:
-                        // Generate moves for White Knights
-                        break;
-                    case 3:
-                        // Generate moves for White Bishops
-                        break;
-                    case 4:
-                        // Generate moves for White Queen
-                        break;
-                    case 5:
-                        // Generate moves for White King
-                        allMoves.AddRange(Generator.Kings.GetWhiteKing(boards, position));
-                        break;
-                    case 6:
-                        // Generate moves for Black Pawns
-                        allMoves.AddRange(Generator.Pawns.GetBlackPawns(boards, position));
-                        break;
-                    case 7:
-                        // Generate moves for Black Rooks
-                        break;
-                    case 8:
-                        // Generate moves for Black Knights
-                        break;
-                    case 9:
-                        // Generate moves for Black Bishops
-                        break;
-                    case 10:
-                        // Generate moves for Black Queen
-                        break;
-                    case 11:
-                        // Generate moves for Black King
-                        allMoves.AddRange(Generator.Kings.GetBlackKing(boards, position));
-                        break;
-                    default:
-                        break;
-                }
-            }
+            
+            if (i == 5) moves.AddRange(Generator.Kings.GetWhiteKingMoves(boards, position));
+
+            //else if (i == 0) moves.AddRange(Generator.Pawns.GetWhitePawns(boards, position));
+
         }
-        if (legalMovesOnly)
+        foreach (var move in moves)
         {
-            foreach (var move in allMoves)
-            {
 
-                allMoves = allMoves.Where(move => IsLegal(move, boards)).ToList(); // Filter for legal moves
-            }
-            return allMoves;
+            moves = moves.Where(move => IsLegal(move, boards)).ToList(); // Filter for legal moves
         }
-
-        return allMoves;
+        return moves;
     }
 
+    internal static List<MoveObject> GenerateBlackMoves(List<ulong> boards)
+    {
+        List<MoveObject> moves = new();
+        foreach (ulong board in boards) position |= board;
+
+        for (int i = 0; i < boards.Count; i++)
+        {
+            if (i == 6) moves.AddRange(Generator.Pawns.GetBlackPawns(boards, position));
+            if (i == 11) moves.AddRange(Generator.Kings.GetBlackKingMoves(boards, position));
+        }
+        foreach (var move in moves)
+        {
+
+            moves = moves.Where(move => IsLegal(move, boards)).ToList(); // Filter for legal moves
+        }
+        return moves;
+      
+    }
 
     internal static bool IsLegal(MoveObject move, List<ulong> boards)
     {
