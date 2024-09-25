@@ -1,27 +1,43 @@
-﻿namespace Bb_Engine
+﻿public class GameState
 {
-    public static class GameState
-    {
-        public static int InitialTurn { get; set; }
-        public static int Turn { get; set; }
+    public int Turn { get; set; }
+    public bool WhiteCastleKingSide { get; set; }
+    public bool WhiteCastleQueenSide { get; set; }
+    public bool BlackCastleKingSide { get; set; }
+    public bool BlackCastleQueenSide { get; set; }
+    public int EnPassantSquare { get; set; }
 
-        public static bool WhiteCastleKingSide { get; set; } = true;
-        public static bool WhiteCastleQueenSide { get; set; } = true;
-        public static bool BlackCastleKingSide { get; set; } = true;
-        public static bool BlackCastleQueenSide { get; set; } = true;
+    public void RestoreFromSnapshot(GameStateSnapshot snapshot)
+    {
+        Turn = snapshot.Turn;
+        WhiteCastleKingSide = snapshot.WhiteCastleKingSide;
+        WhiteCastleQueenSide = snapshot.WhiteCastleQueenSide;
+        BlackCastleKingSide = snapshot.BlackCastleKingSide;
+        BlackCastleQueenSide = snapshot.BlackCastleQueenSide;
+        EnPassantSquare = snapshot.EnPassantSquare;
+    }
+}
+
+public class GameStateSnapshot
+{
+    public int Turn { get; set; }
+    public bool WhiteCastleKingSide { get; set; }
+    public bool WhiteCastleQueenSide { get; set; }
+    public bool BlackCastleKingSide { get; set; }
+    public bool BlackCastleQueenSide { get; set; }
+    public int EnPassantSquare { get; set; }
+
+    public GameStateSnapshot()
+    {
     }
 
-    public class GameStateSnapshot
+    public GameStateSnapshot(GameState gameState)
     {
-        public int Turn { get; set; }
-        public bool WhiteCastleKingSide { get; set; }
-        public bool WhiteCastleQueenSide { get; set; }
-        public bool BlackCastleKingSide { get; set; }
-        public bool BlackCastleQueenSide { get; set; }
-
-        public GameStateSnapshot Clone()
-        {
-            return (GameStateSnapshot)this.MemberwiseClone();
-        }
+        Turn = gameState.Turn;
+        WhiteCastleKingSide = gameState.WhiteCastleKingSide;
+        WhiteCastleQueenSide = gameState.WhiteCastleQueenSide;
+        BlackCastleKingSide = gameState.BlackCastleKingSide;
+        BlackCastleQueenSide = gameState.BlackCastleQueenSide;
+        EnPassantSquare = gameState.EnPassantSquare;
     }
 }

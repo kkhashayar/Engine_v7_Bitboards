@@ -1,81 +1,105 @@
 ﻿using System.Numerics;
+using System.Collections.Generic;
 
 namespace Bb_Engine.Generator;
 
 internal static class Kings
 {
+    private static readonly ulong[] KingAttacks = new ulong[64];
 
-    private static readonly int[] kingOffsets = { 1, -1, 8, -8, 9, -9, 7, -7 }; // Possible king moves
-
-    public static List<MoveObject> GetWhiteKing(List<ulong> boards, ulong position)
+    static Kings()
     {
-        return GenerateKingMoves(boards[5], position, boards, false);
+        InitializeKingAttacks();
     }
 
-    public static List<MoveObject> GetBlackKing(List<ulong> boards, ulong position)
+    private static void InitializeKingAttacks()
     {
-        return GenerateKingMoves(boards[11], position, boards, true);
+        for (int square = 0; square < 64; square++)
+        {
+            KingAttacks[square] = ComputeKingAttacks(square);
+        }
     }
 
-    private static List<MoveObject> GenerateKingMoves(ulong kingBoard, ulong position, List<ulong> boards, bool isBlack)
+    private static ulong ComputeKingAttacks(int square)
+    {
+        ulong attacks = 0UL;
+        ulong bitboard = 1UL << square;
+
+        int rank = square / 8;
+        int file = square % 8;
+
+        // Up
+        if (rank < 7) attacks |= bitboard << 8;
+        // Down
+        if (rank > 0) attacks |= bitboard >> 8;
+        // Left
+        if (file > 0) attacks |= bitboard >> 1;
+        // Right
+        if (file < 7) attacks |= bitboard << 1;
+        // Up-Left
+        if (rank < 7 && file > 0) attacks |= bitboard << 7;
+        // Up-Right
+        if (rank < 7 && file < 7) attacks |= bitboard << 9;
+        // Down-Left
+        if (rank > 0 && file > 0) attacks |= bitboard >> 9;
+        // Down-Right
+        if (rank > 0 && file < 7) attacks |= bitboard >> 7;
+
+        return attacks;
+    }
+
+    public static List<MoveObject> GetWhiteKing(List<ulong> boards)
+    {
+        return GenerateKingMoves(boards[5], boards, false);
+    }
+
+    public static List<MoveObject> GetBlackKing(List<ulong> boards)
+    {
+        return GenerateKingMoves(boards[11], boards, true);
+    }
+
+    private static List<MoveObject> GenerateKingMoves(ulong kingBoard, List<ulong> boards, bool isBlack)
     {
         List<MoveObject> allMoves = new();
+
+        if (kingBoard == 0) return allMoves;
+
+        int fromSquare = BitOperations.TrailingZeroCount(kingBoard);
+
+        ulong ownPieces = isBlack ? (boards[6] | boards[7] | boards[8] | boards[9] | boards[10] | boards[11])
+                                  : (boards[0] | boards[1] | boards[2] | boards[3] | boards[4] | boards[5]);
+
         ulong enemyPieces = isBlack ? (boards[0] | boards[1] | boards[2] | boards[3] | boards[4] | boards[5])
                                     : (boards[6] | boards[7] | boards[8] | boards[9] | boards[10] | boards[11]);
 
-        while (kingBoard != 0)
+        ulong attacks = KingAttacks[fromSquare] & ~ownPieces;
+
+        while (attacks != 0)
         {
-            int fromSquare = BitOperations.TrailingZeroCount(kingBoard);
-            ulong fromSquareMask = 1UL << fromSquare;
+            int toSquare = BitOperations.TrailingZeroCount(attacks);
+            ulong toSquareMask = 1UL << toSquare;
+            bool isCapture = (enemyPieces & toSquareMask) != 0;
 
-            foreach (int offset in kingOffsets)
+            MoveObject newMove = new MoveObject
             {
-                int toSquare = fromSquare + offset;
-                if (toSquare >= 0 && toSquare < 64)
-                {
-                    ulong toSquareMask = 1UL << toSquare;
-                    if ((toSquareMask & ~position) != 0 || (toSquareMask & enemyPieces) != 0)
-                    {
-                        MoveObject newMove = new MoveObject
-                        {
-                            startPosition = fromSquare,
-                            EndSquare = toSquare
-                        };
-                        allMoves.Add(newMove);
-                    }
-                }
-            }
+                startPosition = fromSquare,
+                EndSquare = toSquare,
+                IsCapture = isCapture
+            };
 
-            kingBoard &= kingBoard - 1; // Remove the last set bit
+            allMoves.Add(newMove);
+
+            attacks &= attacks - 1;
         }
 
         return allMoves;
     }
 
-    public static ulong GetBlackKingAttacks(ulong blackKingBoard)
+    public static ulong GetKingAttacks(ulong kingBoard)
     {
-        return GenerateKingAttacks(blackKingBoard);
-    }
+        if (kingBoard == 0) return 0UL;
 
-    public static ulong GetWhiteKingAttacks(ulong whiteKingBoard)
-    {
-        return GenerateKingAttacks(whiteKingBoard);
-    }
-
-    private static ulong GenerateKingAttacks(ulong kingBoard)
-    {
-        ulong attacks = 0UL;
         int kingSquare = BitOperations.TrailingZeroCount(kingBoard);
-
-        foreach (int offset in kingOffsets)
-        {
-            int targetSquare = kingSquare + offset;
-            if (targetSquare >= 0 && targetSquare < 64)
-            {
-                attacks |= 1UL << targetSquare;
-            }
-        }
-
-        return attacks;
+        return KingAttacks[kingSquare];
     }
 }

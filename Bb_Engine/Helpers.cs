@@ -63,3 +63,54 @@ public static class Helpers
 
     };
 }
+
+/*
+          
+{
+    public static class Helpers
+    {
+        public static class PieceMapper
+        {
+            public static Dictionary<char, char> pieceToUnicode = new Dictionary<char, char>
+            {
+                {'P', '\u2659'}, // white pawn
+                {'N', '\u2658'}, // white knight
+                {'B', '\u2657'}, // white bishop
+                {'R', '\u2656'}, // white rook
+                {'Q', '\u2655'}, // white queen
+                {'K', '\u2654'}, // white king
+                {'p', '\u265F'}, // black pawn
+                {'n', '\u265E'}, // black knight
+                {'b', '\u265D'}, // black bishop
+                {'r', '\u265C'}, // black rook
+                {'q', '\u265B'}, // black queen
+                {'k', '\u265A'}  // black king
+            };
+        }
+
+        public static Dictionary<string, ulong> CoordinateToBitBoard = new Dictionary<string, ulong>();
+        public static Dictionary<ulong, string> BitBoardToCoordinate = new Dictionary<ulong, string>();
+
+        static Helpers()
+        {
+            InitializeCoordinateMappings();
+        }
+
+        private static void InitializeCoordinateMappings()
+        {
+            for (int square = 0; square < 64; square++)
+            {
+                int file = square % 8;
+                int rank = square / 8;
+
+                string coordinate = $"{(char)('a' + file)}{rank + 1}";
+                ulong bitboard = 1UL << square;
+
+                CoordinateToBitBoard[coordinate] = bitboard;
+                BitBoardToCoordinate[bitboard] = coordinate;
+            }
+        }
+    }
+}
+
+ */
