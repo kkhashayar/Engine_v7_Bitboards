@@ -32,7 +32,7 @@ PrintBoard(Boards.GetBoards(), gameState);
 void RunPerftWithVerification(string fen, int perftDepth, GameState gameState)
 {
     Console.ForegroundColor = ConsoleColor.Black;
-    Console.WriteLine("******* Engine 6 *******  \n");
+    Console.WriteLine("******* Engine 7 BB *******  \n");
     Console.WriteLine($"Perft test at depth: {perftDepth} on: \n");
     Console.WriteLine($"{fen} \n");
 
