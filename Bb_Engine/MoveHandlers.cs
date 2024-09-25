@@ -7,17 +7,10 @@ namespace Bb_Engine
         private static Stack<GameStateSnapshot> gameStateHistory = new Stack<GameStateSnapshot>();
         private static Stack<MoveObject> moveHistory = new Stack<MoveObject>();
 
-        public static void MakeMove(List<ulong> boards, MoveObject move)
+        public static void MakeMove(List<ulong> boards, MoveObject move, GameState gameState)
         {
             // Save current game state
-            var snapshot = new GameStateSnapshot
-            {
-                Turn = GameState.Turn,
-                WhiteCastleKingSide = GameState.WhiteCastleKingSide,
-                WhiteCastleQueenSide = GameState.WhiteCastleQueenSide,
-                BlackCastleKingSide = GameState.BlackCastleKingSide,
-                BlackCastleQueenSide = GameState.BlackCastleQueenSide
-            };
+            var snapshot = new GameStateSnapshot(gameState);
             gameStateHistory.Push(snapshot);
 
             ulong fromMask = 1UL << move.startPosition;
@@ -28,18 +21,7 @@ namespace Bb_Engine
             {
                 if ((boards[i] & fromMask) != 0)
                 {
-                    // Handle castling
-                    if (move.IsCastling)
-                    {
-                        HandleCastling(i, move, boards);
-                    }
-                    else
-                    {
-                        boards[i] &= ~fromMask; // Remove piece from start square
-                        boards[i] |= toMask;    // Place piece on destination square
-                    }
-
-                    // Handle captures
+                    // Handle captures before moving the piece
                     for (int j = 0; j < boards.Count; j++)
                     {
                         if ((boards[j] & toMask) != 0 && j != i)
@@ -50,6 +32,17 @@ namespace Bb_Engine
                         }
                     }
 
+                    // Now move the piece
+                    if (move.IsCastling)
+                    {
+                        HandleCastling(i, move, boards);
+                    }
+                    else
+                    {
+                        boards[i] &= ~fromMask; // Remove piece from start square
+                        boards[i] |= toMask;    // Place piece on destination square
+                    }
+
                     break;
                 }
             }
@@ -57,13 +50,13 @@ namespace Bb_Engine
             moveHistory.Push(move);
 
             // Update game state
-            UpdateGameStateAfterMove(move);
+            UpdateGameStateAfterMove(move, gameState);
 
             // Switch turn
-            GameState.Turn = GameState.Turn == 0 ? 1 : 0;
+            gameState.Turn = 1 - gameState.Turn;
         }
 
-        public static void UndoMove(List<ulong> boards)
+        public static void UndoMove(List<ulong> boards, GameState gameState)
         {
             if (moveHistory.Count == 0) return;
 
@@ -71,11 +64,7 @@ namespace Bb_Engine
             GameStateSnapshot snapshot = gameStateHistory.Pop();
 
             // Restore game state
-            GameState.Turn = snapshot.Turn;
-            GameState.WhiteCastleKingSide = snapshot.WhiteCastleKingSide;
-            GameState.WhiteCastleQueenSide = snapshot.WhiteCastleQueenSide;
-            GameState.BlackCastleKingSide = snapshot.BlackCastleKingSide;
-            GameState.BlackCastleQueenSide = snapshot.BlackCastleQueenSide;
+            gameState.RestoreFromSnapshot(snapshot);
 
             ulong fromMask = 1UL << move.startPosition;
             ulong toMask = 1UL << move.EndSquare;
@@ -84,16 +73,11 @@ namespace Bb_Engine
             {
                 if ((boards[i] & toMask) != 0)
                 {
-                    if (move.IsCastling)
-                    {
-                        UndoCastling(i, move, boards);
-                    }
-                    else
-                    {
-                        boards[i] &= ~toMask;
-                        boards[i] |= fromMask;
-                    }
+                    // Undo move
+                    boards[i] &= ~toMask;
+                    boards[i] |= fromMask;
 
+                    // Restore captured piece
                     if (move.capturedPiece.HasValue)
                     {
                         boards[move.capturedPiece.Value] |= toMask;
@@ -106,88 +90,41 @@ namespace Bb_Engine
 
         private static void HandleCastling(int pieceIndex, MoveObject move, List<ulong> boards)
         {
-            if (pieceIndex == 5) // White King
-            {
-                if (move.EndSquare == 62) // White king-side castle
-                {
-                    boards[1] = boards[1] & ~0x0000000000000008UL | 0x0800000000000000UL;
-                }
-                else if (move.EndSquare == 58) // White queen-side castle
-                {
-                    boards[1] = boards[1] & ~0x0000000000000010UL | 0x0100000000000000UL;
-                }
-            }
-            else if (pieceIndex == 11) // Black King
-            {
-                if (move.EndSquare == 6) // Black king-side castle
-                {
-                    boards[7] = boards[7] & ~0x0000000000000008UL | 0x0800000000000000UL;
-                }
-                else if (move.EndSquare == 2) // Black queen-side castle
-                {
-                    boards[7] = boards[7] & ~0x0000000000000010UL | 0x0100000000000000UL;
-                }
-            }
+            // Implement castling logic as needed
         }
 
-        private static void UndoCastling(int pieceIndex, MoveObject move, List<ulong> boards)
-        {
-            if (pieceIndex == 5) // White King
-            {
-                if (move.EndSquare == 62)
-                {
-                    boards[1] = boards[1] & ~0x0800000000000000UL | 0x0000000000000008UL;
-                }
-                else if (move.EndSquare == 58)
-                {
-                    boards[1] = boards[1] & ~0x0100000000000000UL | 0x0000000000000010UL;
-                }
-            }
-            else if (pieceIndex == 11) // Black King
-            {
-                if (move.EndSquare == 6)
-                {
-                    boards[7] = boards[7] & ~0x0800000000000000UL | 0x0000000000000008UL;
-                }
-                else if (move.EndSquare == 2)
-                {
-                    boards[7] = boards[7] & ~0x0100000000000000UL | 0x0000000000000010UL;
-                }
-            }
-        }
-
-        private static void UpdateGameStateAfterMove(MoveObject move)
+        private static void UpdateGameStateAfterMove(MoveObject move, GameState gameState)
         {
             if (move.startPosition == 4) // White King moved
             {
-                GameState.WhiteCastleKingSide = false;
-                GameState.WhiteCastleQueenSide = false;
+                gameState.WhiteCastleKingSide = false;
+                gameState.WhiteCastleQueenSide = false;
             }
             else if (move.startPosition == 60) // Black King moved
             {
-                GameState.BlackCastleKingSide = false;
-                GameState.BlackCastleQueenSide = false;
+                gameState.BlackCastleKingSide = false;
+                gameState.BlackCastleQueenSide = false;
             }
             else if (move.startPosition == 0 || move.startPosition == 7) // White Rook moved
             {
                 if (move.startPosition == 0)
                 {
-                    GameState.WhiteCastleQueenSide = false;
+                    gameState.WhiteCastleQueenSide = false;
                 }
                 else
                 {
-                    GameState.WhiteCastleKingSide = false;
+                    gameState.WhiteCastleKingSide = false;
                 }
             }
             else if (move.startPosition == 56 || move.startPosition == 63) // Black Rook moved
             {
                 if (move.startPosition == 56)
                 {
-                    GameState.BlackCastleQueenSide = false;
+                    gameState.BlackCastleQueenSide = false;
                 }
                 else
                 {
-                    GameState.BlackCastleKingSide = false;
+                    gameState.BlackCastleKingSide = false;
                 }
             }
         }

@@ -4,12 +4,30 @@
     {
         public static void Read(string fen)
         {
-            if (string.IsNullOrEmpty(fen)) fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+            if (string.IsNullOrEmpty(fen))
+                fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+
             string[] fenParts = fen.Split(" ");
             string piecePosition = fenParts[0];
-            // starts from top left
+
+            // Reset all boards before setting new positions
+            Boards.WhitePawns = 0;
+            Boards.WhiteRooks = 0;
+            Boards.WhiteKnights = 0;
+            Boards.WhiteBishops = 0;
+            Boards.WhiteQueen = 0;
+            Boards.WhiteKing = 0;
+            Boards.BlackPawns = 0;
+            Boards.BlackRooks = 0;
+            Boards.BlackKnights = 0;
+            Boards.BlackBishops = 0;
+            Boards.BlackQueen = 0;
+            Boards.BlackKing = 0;
+
+            // Start from top left
             int rank = 7;
             int file = 0;
+
             foreach (char symbol in piecePosition)
             {
                 if (char.IsDigit(symbol))
@@ -64,16 +82,34 @@
                         case 'k':
                             Boards.BlackKing |= 1UL << bitPosition;
                             break;
+                        default:
+                            // Handle any unexpected characters
+                            break;
                     }
 
                     file++;
                 }
             }
-            if (fenParts[1] == "w") GameState.InitialTurn = 0;
-            else if (fenParts[1] == "b") GameState.InitialTurn = 1; 
+
+            // Set the initial turn in Boards, not GameState
+            if (fenParts.Length > 1)
+            {
+                if (fenParts[1] == "w")
+                    Boards.InitialTurn = 0;
+                else if (fenParts[1] == "b")
+                    Boards.InitialTurn = 1;
+            }
+            else
+            {
+                // Default to White's turn if not specified
+                Boards.InitialTurn = 0;
+            }
+
+            // You can also parse castling rights, en passant square, etc., if needed
         }
     }
 }
+
 /*    
     ******** Board layout ********
     

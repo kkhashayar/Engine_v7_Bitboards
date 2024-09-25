@@ -1,38 +1,58 @@
 ﻿using Bb_Engine;
 using Bb_Engine.ExternalResources;
 
-string fen = "8/8/8/7k/8/7K/8/8 w - - 0 1";
+
+string fen = "8/5p2/7k/8/8/7K/5P2/8 w - - 0 1";
+
+
 Fen.Read(fen);
 
-RunPerftWIthVerification(fen, 2);
+// Initialize GameState
+GameState gameState = new GameState
+{
+    Turn = Boards.InitialTurn,
+    WhiteCastleKingSide = true,
+    WhiteCastleQueenSide = true,
+    BlackCastleKingSide = true,
+    BlackCastleQueenSide = true,
+    EnPassantSquare = -1
+};
 
-PrintBoard(Boards.GetBoards());
 
-PrintBoardSquareNumbers();
+int perftDepth = 4;
 
-//////////////////////////////////////////////////////////////// Functions ////////////////////////////////////////////////////////////////
-void RunPerftWIthVerification(string fen, int perftDepth)
+RunPerftWithVerification(fen, perftDepth, gameState);
+
+PrintBoard(Boards.GetBoards(), gameState);
+
+// PrintBoardSquareNumbers();
+
+////////////////////////////////////////////////////////////// Functions //////////////////////////////////////////////////////////////
+
+void RunPerftWithVerification(string fen, int perftDepth, GameState gameState)
 {
     Console.ForegroundColor = ConsoleColor.Black;
-    Console.WriteLine("******* Engine 7 BitBoards *******  \n");
-    Console.WriteLine($"Perft test in depth: {perftDepth} on: \n");
+    Console.WriteLine("******* Engine 6 *******  \n");
+    Console.WriteLine($"Perft test at depth: {perftDepth} on: \n");
     Console.WriteLine($"{fen} \n");
-    Perft.TestPerft(fen, perftDepth);
+
+    // Run the perft test
+    Perft.TestPerft(fen, perftDepth, gameState);
+
     Console.WriteLine();
     Console.Beep(2000, 50);
     Console.WriteLine("Press 'V' to verify with Stockfish or any key to exit \n");
-    
+
     char input = Console.ReadKey().KeyChar;
     if (input == 'v' || input == 'V')
     {
         VerifyWithStockfish(fen, perftDepth);
         Console.WriteLine("Press any key to continue\n");
-        Console.ReadKey();    
+        Console.ReadKey();
     }
 
-    Environment.Exit(0);    
+    Environment.Exit(0);
 }
-
 
 void VerifyWithStockfish(string fen, int depth)
 {
@@ -49,46 +69,42 @@ void VerifyWithStockfish(string fen, int depth)
 
     while ((output = stockfish.ReadOutput()) != null)
     {
-
         Console.WriteLine(output);
-        if (output.StartsWith("Stockfish result:  ")) break;
+        if (output.StartsWith("Nodes searched:")) break;
     }
-
 }
 
-
-
-
-void PrintBoard(List<ulong> boards)
+void PrintBoard(List<ulong> boards, GameState gameState)
 {
-    for (int rank = 7; rank >= 0; rank--) // start from the 8th rank and move down to the 1st
+    for (int rank = 7; rank >= 0; rank--) // Start from rank 8 down to rank 1
     {
         Console.ForegroundColor = ConsoleColor.DarkBlue;
         Console.Write((rank + 1) + " "); // Print rank number
 
         for (int file = 0; file < 8; file++)
         {
-            int shift = rank * 8 + file;
+            int square = rank * 8 + file;
             char pieceSymbol = '.';
-           
-            if      ((boards[0]  & (1UL << shift))  != 0) pieceSymbol = 'P';
-            else if ((boards[6]  & (1UL << shift))  != 0) pieceSymbol = 'p';
-            else if ((boards[1]  & (1UL << shift))  != 0) pieceSymbol = 'R';
-            else if ((boards[7]  & (1UL << shift))  != 0) pieceSymbol = 'r';
-            else if ((boards[2]  & (1UL << shift))  != 0) pieceSymbol = 'N';
-            else if ((boards[8]  & (1UL << shift))  != 0) pieceSymbol = 'n';
-            else if ((boards[3]  & (1UL << shift))  != 0) pieceSymbol = 'B';
-            else if ((boards[9]  & (1UL << shift))  != 0) pieceSymbol = 'b';
-            else if ((boards[4]  & (1UL << shift))  != 0) pieceSymbol = 'Q';
-            else if ((boards[10] & (1UL << shift))  != 0) pieceSymbol = 'q';
-            else if ((boards[5]  & (1UL << shift))  != 0) pieceSymbol = 'K';
-            else if ((boards[11] & (1UL << shift))  != 0) pieceSymbol = 'k';
 
+            if ((boards[0] & (1UL << square)) != 0) pieceSymbol = 'P';
+            else if ((boards[6] & (1UL << square)) != 0) pieceSymbol = 'p';
+            else if ((boards[1] & (1UL << square)) != 0) pieceSymbol = 'R';
+            else if ((boards[7] & (1UL << square)) != 0) pieceSymbol = 'r';
+            else if ((boards[2] & (1UL << square)) != 0) pieceSymbol = 'N';
+            else if ((boards[8] & (1UL << square)) != 0) pieceSymbol = 'n';
+            else if ((boards[3] & (1UL << square)) != 0) pieceSymbol = 'B';
+            else if ((boards[9] & (1UL << square)) != 0) pieceSymbol = 'b';
+            else if ((boards[4] & (1UL << square)) != 0) pieceSymbol = 'Q';
+            else if ((boards[10] & (1UL << square)) != 0) pieceSymbol = 'q';
+            else if ((boards[5] & (1UL << square)) != 0) pieceSymbol = 'K';
+            else if ((boards[11] & (1UL << square)) != 0) pieceSymbol = 'k';
 
-            if(pieceSymbol != '.')
+            if (pieceSymbol != '.')
             {
                 Console.ForegroundColor = ConsoleColor.Black;
                 Console.OutputEncoding = System.Text.Encoding.Unicode;
+
+                // Map piece symbols to Unicode characters
                 Console.Write(Helpers.PieceMapper.pieceToUnicode[pieceSymbol] + " ");
             }
             else
@@ -104,18 +120,18 @@ void PrintBoard(List<ulong> boards)
     Console.ForegroundColor = ConsoleColor.DarkBlue;
     Console.WriteLine("  A B C D E F G H");
     Console.WriteLine();
-    Console.WriteLine($"Turn: {GameState.Turn}");
+    Console.WriteLine($"Turn: {(gameState.Turn == 0 ? "White" : "Black")}");
     Thread.Sleep(100);
 }
 
 void PrintBoardSquareNumbers()
 {
     Console.WriteLine();
-    Console.WriteLine("Board Square numbers");
+    Console.WriteLine("Board Square Numbers");
     Console.WriteLine("********************");
-   
+
     // Loop over board ranks
-    for (int rank = 0; rank < 8; rank++)
+    for (int rank = 7; rank >= 0; rank--)
     {
         // Loop over board files
         for (int file = 0; file < 8; file++)
