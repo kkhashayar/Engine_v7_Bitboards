@@ -9,7 +9,7 @@ public static class Perft
     {
         if (depth == 0)
         {
-            return 1; // Base case: one leaf node reached
+            return 1;
         }
 
         List<MoveObject> moves = MoveGenerator.GenerateMoves(boards, gameState, legalMovesOnly);
@@ -17,13 +17,17 @@ public static class Perft
 
         foreach (var move in moves)
         {
-            MoveHandlers.MakeMove(boards, move, gameState);
-            nodes += RunPerft(boards, depth - 1, gameState, legalMovesOnly);
-            MoveHandlers.UndoMove(boards, gameState);
+            // Clone gameState before making the move
+            GameState clonedGameState = new GameState(gameState);
+
+            MoveHandlers.MakeMove(boards, move, clonedGameState);
+            nodes += RunPerft(boards, depth - 1, clonedGameState, legalMovesOnly);
+            MoveHandlers.UndoMove(boards, clonedGameState);
         }
 
         return nodes;
     }
+
 
     public static void TestPerft(string fen, int depth, GameState gameState)
     {
@@ -39,9 +43,12 @@ public static class Perft
 
         foreach (var move in moves)
         {
-            MoveHandlers.MakeMove(boards, move, gameState);
-            ulong childNodes = RunPerft(boards, depth - 1, gameState, true);
-            MoveHandlers.UndoMove(boards, gameState);
+            // Clone gameState before making the move
+            GameState clonedGameState = new GameState(gameState);
+
+            MoveHandlers.MakeMove(boards, move, clonedGameState);
+            ulong childNodes = RunPerft(boards, depth - 1, clonedGameState, true);
+            MoveHandlers.UndoMove(boards, clonedGameState);
 
             Console.WriteLine($"{move.ToString()}: {childNodes}");
             nodes += childNodes;
@@ -49,4 +56,5 @@ public static class Perft
 
         Console.WriteLine($"\nTotal nodes: {nodes}");
     }
+
 }

@@ -1,77 +1,10 @@
-﻿namespace Bb_Engine;
-
-public static class Helpers
-{
-    public static class PieceMapper
-    {
-        public static Dictionary<char, char> pieceToUnicode = new Dictionary<char, char>
-        {
-            {'P', '\u2659'}, // white pawn
-            {'N', '\u2658'}, // white knight
-            {'B', '\u2657'}, // white bishop
-            {'R', '\u2656'}, // white rook
-            {'Q', '\u2655'}, // white queen
-            {'K', '\u2654'}, // white king
-            {'p', '\u265F'}, // black pawn
-            {'n', '\u265E'}, // black knight
-            {'b', '\u265D'}, // black bishop
-            {'r', '\u265C'}, // black rook
-            {'q', '\u265B'}, // black queen
-            {'k', '\u265A'}  // black king
-        };
-    }
-
-
-    public static Dictionary<string, ulong> CoordinateToBitBoard = new Dictionary<string, ulong>
-    {
-        {"h8", 0x8000000000000000UL}, {"g8", 0x4000000000000000UL}, {"f8", 0x2000000000000000UL}, {"e8", 0x1000000000000000UL},
-        {"d8", 0x800000000000000UL},  {"c8", 0x400000000000000UL},  {"b8", 0x200000000000000UL},  {"a8", 0x100000000000000UL},
-        {"h7", 0x80000000000000UL},   {"g7", 0x40000000000000UL},   {"f7", 0x20000000000000UL},   {"e7", 0x10000000000000UL},
-        {"d7", 0x8000000000000UL},    {"c7", 0x4000000000000UL},    {"b7", 0x2000000000000UL},    {"a7", 0x1000000000000UL},
-        {"h6", 0x800000000000UL},     {"g6", 0x400000000000UL},     {"f6", 0x200000000000UL},     {"e6", 0x100000000000UL},
-        {"d6", 0x80000000000UL},      {"c6", 0x40000000000UL},      {"b6", 0x20000000000UL},      {"a6", 0x10000000000UL},
-        {"h5", 0x8000000000UL},       {"g5", 0x4000000000UL},       {"f5", 0x2000000000UL},       {"e5", 0x1000000000UL},
-        {"d5", 0x800000000UL},        {"c5", 0x400000000UL},        {"b5", 0x200000000UL},        {"a5", 0x100000000UL},
-        {"h4", 0x80000000UL},         {"g4", 0x40000000UL},         {"f4", 0x20000000UL},         {"e4", 0x10000000UL},
-        {"d4", 0x8000000UL},          {"c4", 0x4000000UL},          {"b4", 0x2000000UL},          {"a4", 0x1000000UL},
-        {"h3", 0x800000UL},           {"g3", 0x400000UL},           {"f3", 0x200000UL},           {"e3", 0x100000UL},
-        {"d3", 0x80000UL},            {"c3", 0x40000UL},            {"b3", 0x20000UL},            {"a3", 0x10000UL},
-        {"h2", 0x8000UL},             {"g2", 0x4000UL},             {"f2", 0x2000UL},             {"e2", 0x1000UL},
-        {"d2", 0x800UL},              {"c2", 0x400UL},              {"b2", 0x200UL},              {"a2", 0x100UL},
-        {"h1", 0x80UL},               {"g1", 0x40UL},               {"f1", 0x20UL},               {"e1", 0x10UL},
-        {"d1", 0x8UL},                {"c1", 0x4UL},                {"b1", 0x2UL},                {"a1", 0x1UL}
-    };
-
-    public static Dictionary<ulong, string> BitBoardToCoordinate = new Dictionary<ulong, string>
-    {
-        {0x8000000000000000UL, "h8"}, {0x4000000000000000UL, "g8"}, {0x2000000000000000UL, "f8"}, {0x1000000000000000UL, "e8"},
-        {0x800000000000000UL, "d8"},  {0x400000000000000UL, "c8"},  {0x200000000000000UL, "b8"},  {0x100000000000000UL, "a8"},
-        {0x80000000000000UL, "h7"},   {0x40000000000000UL, "g7"},   {0x20000000000000UL, "f7"},   {0x10000000000000UL, "e7"},
-        {0x8000000000000UL, "d7"},    {0x4000000000000UL, "c7"},    {0x2000000000000UL, "b7"},    {0x1000000000000UL, "a7"},
-        {0x800000000000UL, "h6"},     {0x400000000000UL, "g6"},     {0x200000000000UL, "f6"},     {0x100000000000UL, "e6"},
-        {0x80000000000UL, "d6"},      {0x40000000000UL, "c6"},      {0x20000000000UL, "b6"},      {0x10000000000UL, "a6"},
-        {0x8000000000UL, "h5"},       {0x4000000000UL, "g5"},       {0x2000000000UL, "f5"},       {0x1000000000UL, "e5"},
-        {0x800000000UL, "d5"},        {0x400000000UL, "c5"},        {0x200000000UL, "b5"},        {0x100000000UL, "a5"},
-        {0x80000000UL, "h4"},         {0x40000000UL, "g4"},         {0x20000000UL, "f4"},         {0x10000000UL, "e4"},
-        {0x8000000UL, "d4"},          {0x4000000UL, "c4"},          {0x2000000UL, "b4"},          {0x1000000UL, "a4"},
-        {0x800000UL, "h3"},           {0x400000UL, "g3"},           {0x200000UL, "f3"},           {0x100000UL, "e3"},
-        {0x80000UL, "d3"},            {0x40000UL, "c3"},            {0x20000UL, "b3"},            {0x10000UL, "a3"},
-        {0x8000UL, "h2"},             {0x4000UL, "g2"},             {0x2000UL, "f2"},             {0x1000UL, "e2"},
-        {0x800UL, "d2"},              {0x400UL, "c2"},              {0x200UL, "b2"},              {0x100UL, "a2"},
-        {0x80UL, "h1"},               {0x40UL, "g1"},               {0x20UL, "f1"},               {0x10UL, "e1"},
-        {0x8UL, "d1"},                {0x4UL, "c1"},                {0x2UL, "b1"},                {0x1UL, "a1"}
-
-    };
-}
-
-/*
-          
+﻿namespace Bb_Engine
 {
     public static class Helpers
     {
         public static class PieceMapper
         {
-            public static Dictionary<char, char> pieceToUnicode = new Dictionary<char, char>
+            public static readonly Dictionary<char, char> pieceToUnicode = new Dictionary<char, char>
             {
                 {'P', '\u2659'}, // white pawn
                 {'N', '\u2658'}, // white knight
@@ -88,29 +21,44 @@ public static class Helpers
             };
         }
 
-        public static Dictionary<string, ulong> CoordinateToBitBoard = new Dictionary<string, ulong>();
-        public static Dictionary<ulong, string> BitBoardToCoordinate = new Dictionary<ulong, string>();
-
-        static Helpers()
+        public static readonly Dictionary<string, ulong> CoordinateToBitBoard = new Dictionary<string, ulong>
         {
-            InitializeCoordinateMappings();
-        }
+            { "a8", 1UL << 0 },   { "b8", 1UL << 1 },   { "c8", 1UL << 2 },   { "d8", 1UL << 3 },
+            { "e8", 1UL << 4 },   { "f8", 1UL << 5 },   { "g8", 1UL << 6 },   { "h8", 1UL << 7 },
+            { "a7", 1UL << 8 },   { "b7", 1UL << 9 },   { "c7", 1UL << 10 },  { "d7", 1UL << 11 },
+            { "e7", 1UL << 12 },  { "f7", 1UL << 13 },  { "g7", 1UL << 14 },  { "h7", 1UL << 15 },
+            { "a6", 1UL << 16 },  { "b6", 1UL << 17 },  { "c6", 1UL << 18 },  { "d6", 1UL << 19 },
+            { "e6", 1UL << 20 },  { "f6", 1UL << 21 },  { "g6", 1UL << 22 },  { "h6", 1UL << 23 },
+            { "a5", 1UL << 24 },  { "b5", 1UL << 25 },  { "c5", 1UL << 26 },  { "d5", 1UL << 27 },
+            { "e5", 1UL << 28 },  { "f5", 1UL << 29 },  { "g5", 1UL << 30 },  { "h5", 1UL << 31 },
+            { "a4", 1UL << 32 },  { "b4", 1UL << 33 },  { "c4", 1UL << 34 },  { "d4", 1UL << 35 },
+            { "e4", 1UL << 36 },  { "f4", 1UL << 37 },  { "g4", 1UL << 38 },  { "h4", 1UL << 39 },
+            { "a3", 1UL << 40 },  { "b3", 1UL << 41 },  { "c3", 1UL << 42 },  { "d3", 1UL << 43 },
+            { "e3", 1UL << 44 },  { "f3", 1UL << 45 },  { "g3", 1UL << 46 },  { "h3", 1UL << 47 },
+            { "a2", 1UL << 48 },  { "b2", 1UL << 49 },  { "c2", 1UL << 50 },  { "d2", 1UL << 51 },
+            { "e2", 1UL << 52 },  { "f2", 1UL << 53 },  { "g2", 1UL << 54 },  { "h2", 1UL << 55 },
+            { "a1", 1UL << 56 },  { "b1", 1UL << 57 },  { "c1", 1UL << 58 },  { "d1", 1UL << 59 },
+            { "e1", 1UL << 60 },  { "f1", 1UL << 61 },  { "g1", 1UL << 62 },  { "h1", 1UL << 63 },
+        };
 
-        private static void InitializeCoordinateMappings()
+        public static readonly Dictionary<ulong, string> BitBoardToCoordinate = new Dictionary<ulong, string>
         {
-            for (int square = 0; square < 64; square++)
-            {
-                int file = square % 8;
-                int rank = square / 8;
-
-                string coordinate = $"{(char)('a' + file)}{rank + 1}";
-                ulong bitboard = 1UL << square;
-
-                CoordinateToBitBoard[coordinate] = bitboard;
-                BitBoardToCoordinate[bitboard] = coordinate;
-            }
-        }
+            { 1UL << 0,  "a8" },  { 1UL << 1,  "b8" },  { 1UL << 2,  "c8" },  { 1UL << 3,  "d8" },
+            { 1UL << 4,  "e8" },  { 1UL << 5,  "f8" },  { 1UL << 6,  "g8" },  { 1UL << 7,  "h8" },
+            { 1UL << 8,  "a7" },  { 1UL << 9,  "b7" },  { 1UL << 10, "c7" },  { 1UL << 11, "d7" },
+            { 1UL << 12, "e7" },  { 1UL << 13, "f7" },  { 1UL << 14, "g7" },  { 1UL << 15, "h7" },
+            { 1UL << 16, "a6" },  { 1UL << 17, "b6" },  { 1UL << 18, "c6" },  { 1UL << 19, "d6" },
+            { 1UL << 20, "e6" },  { 1UL << 21, "f6" },  { 1UL << 22, "g6" },  { 1UL << 23, "h6" },
+            { 1UL << 24, "a5" },  { 1UL << 25, "b5" },  { 1UL << 26, "c5" },  { 1UL << 27, "d5" },
+            { 1UL << 28, "e5" },  { 1UL << 29, "f5" },  { 1UL << 30, "g5" },  { 1UL << 31, "h5" },
+            { 1UL << 32, "a4" },  { 1UL << 33, "b4" },  { 1UL << 34, "c4" },  { 1UL << 35, "d4" },
+            { 1UL << 36, "e4" },  { 1UL << 37, "f4" },  { 1UL << 38, "g4" },  { 1UL << 39, "h4" },
+            { 1UL << 40, "a3" },  { 1UL << 41, "b3" },  { 1UL << 42, "c3" },  { 1UL << 43, "d3" },
+            { 1UL << 44, "e3" },  { 1UL << 45, "f3" },  { 1UL << 46, "g3" },  { 1UL << 47, "h3" },
+            { 1UL << 48, "a2" },  { 1UL << 49, "b2" },  { 1UL << 50, "c2" },  { 1UL << 51, "d2" },
+            { 1UL << 52, "e2" },  { 1UL << 53, "f2" },  { 1UL << 54, "g2" },  { 1UL << 55, "h2" },
+            { 1UL << 56, "a1" },  { 1UL << 57, "b1" },  { 1UL << 58, "c1" },  { 1UL << 59, "d1" },
+            { 1UL << 60, "e1" },  { 1UL << 61, "f1" },  { 1UL << 62, "g1" },  { 1UL << 63, "h1" },
+        };
     }
 }
-
- */

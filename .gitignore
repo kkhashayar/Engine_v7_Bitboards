@@ -1,8 +1,14 @@
-# Ignore build directories for both Bb_Engine and Bb_Ui
+# Ignore build directories for Bb_Engine and Bb_Ui
 Bb_Engine/bin/
 Bb_Engine/obj/
 Bb_Ui/bin/
 Bb_Ui/obj/
+
+# Ignore NuGet packages
+**/packages/
+*.nupkg
+# Uncomment if you have build files in a separate NuGet folder
+# packages/
 
 # Ignore user-specific files
 *.user
@@ -16,10 +22,51 @@ Bb_Ui/obj/
 *.tmp
 *.temp
 
-# Ignore Visual Studio related files
+# Ignore Visual Studio 2022 related files
 .vs/
 .vscode/
+
+# Ignore Rider IDE specific files
+.idea/
+
+# Ignore JetBrains Rider / ReSharper cache files
+_ReSharper.Caches/
 
 # Ignore other common files
 Thumbs.db
 Desktop.ini
+
+# Ignore compiled DLL files and PDB files
+*.dll
+*.pdb
+*.exe
+
+# Ignore generated class files
+*.g.cs
+*.g.i.cs
+
+# Ignore build artifacts and other temporary files
+*.obj
+*.cache
+*.ilk
+*.log
+*.meta
+*.tlog
+*.lastbuildstate
+*.idb
+*.pidb
+
+# Ignore Publish folder
+**/publish/
+
+# Ignore Visual Studio Code workspace and config
+.vscode/
+*.code-workspace
+
+# Ignore auto-generated files from Visual Studio 2022
+*.dbmdl
+*.jfm
+
+# Ignore local history and debugging logs
+.vs/
+debug.log

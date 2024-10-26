@@ -7,7 +7,7 @@ namespace Bb_Engine.Generator
     {
         internal static ulong position { get; set; } = 0UL;
 
-        internal static List<MoveObject> GenerateMoves(List<ulong> boards, GameState gameState, bool legalMovesOnly)
+        internal static List<MoveObject> GenerateMoves(List<ulong> boards, GameState gameState, bool legalMoves)
         {
             List<MoveObject> allMoves = new();
 
@@ -18,23 +18,22 @@ namespace Bb_Engine.Generator
             }
 
             int turn = gameState.Turn;
-
             if (turn == 0)
             {
                 // Generate moves for White pieces
-                allMoves.AddRange(Kings.GetWhiteKing(boards));
+                allMoves.AddRange(Kings.GenerateWhiteKingMoves(boards, position));
                 allMoves.AddRange(Pawns.GetWhitePawns(boards, gameState));
                 // Add move generation for other White pieces
             }
             else
             {
                 // Generate moves for Black pieces
-                allMoves.AddRange(Kings.GetBlackKing(boards));
+                allMoves.AddRange(Kings.GenerateBlackKingMoves(boards, position));
                 allMoves.AddRange(Pawns.GetBlackPawns(boards, gameState));
                 // Add move generation for other Black pieces
             }
 
-            if (legalMovesOnly)
+            if (legalMoves)
             {
                 allMoves = allMoves.FindAll(move => IsLegal(move, boards, gameState));
             }

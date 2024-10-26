@@ -7,6 +7,27 @@
     public bool BlackCastleQueenSide { get; set; }
     public int EnPassantSquare { get; set; }
 
+    public GameState()
+    {
+        // Initialize default values 
+        Turn = 0; // Default to White's turn
+        WhiteCastleKingSide = true;
+        WhiteCastleQueenSide = true;
+        BlackCastleKingSide = true;
+        BlackCastleQueenSide = true;
+        EnPassantSquare = -1; // -1 indicates no en passant square
+    }
+    // Copy constructor
+    public GameState(GameState other)
+    {
+        this.Turn = other.Turn;
+        this.WhiteCastleKingSide = other.WhiteCastleKingSide;
+        this.WhiteCastleQueenSide = other.WhiteCastleQueenSide;
+        this.BlackCastleKingSide = other.BlackCastleKingSide;
+        this.BlackCastleQueenSide = other.BlackCastleQueenSide;
+        this.EnPassantSquare = other.EnPassantSquare;
+    }
+
     public void RestoreFromSnapshot(GameStateSnapshot snapshot)
     {
         Turn = snapshot.Turn;
